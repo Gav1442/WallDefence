@@ -25,7 +25,8 @@ public class Actor {
 	}
 
 	//find out what is required for drawing and if this needs to be moved to a seperate draw function for each.
-	// visit obviam.net for a detailed tutorial. Also, set up Git. git init and stuff. pull git ignore before pushing
+	// visit obviam.net for a detailed tutorial. 
+	//Testing Git
 	public void drawBitmap(Canvas canvas) {
 		// Log.d(TAG,"Screen height is: 768. Object onScreen y is: " +
 		// (y-height) +", height: " + height+ ",bottom: " + y);
