@@ -15,22 +15,20 @@ public class Actor {
 	protected Bitmap bitmap;
 	protected final String TAG = "Actor";
 	protected boolean ranged;
-	protected Rect body; // Implement Rect in the morning. Probably makes
+	protected Rect srcRect, body; // Implement Rect in the morning. Probably makes
 							// collision detection easier!
-
+	private int numberOfFrame, currentFrame, framePeriod;
+	private long frameTicker;
+	
 	public Actor(Bitmap bitmap, int x, int y) {
 		this.x = x;
 		this.y = y;
 		this.bitmap = bitmap;
 	}
-
-	//find out what is required for drawing and if this needs to be moved to a seperate draw function for each.
-	// visit obviam.net for a detailed tutorial. 
-	//Testing Git
+	//Still need to set srcRect
 	public void drawBitmap(Canvas canvas) {
-		// Log.d(TAG,"Screen height is: 768. Object onScreen y is: " +
-		// (y-height) +", height: " + height+ ",bottom: " + y);
-		canvas.drawBitmap(bitmap, x, y - height, null);
+		//Body is the position of the person (the encompassing rect) on the screen. Body is also used for collision detection.
+		canvas.drawBitmap(bitmap, srcRect, body, null);
 	}
 
 	public boolean checkIntersection(int eventX, int eventY) {

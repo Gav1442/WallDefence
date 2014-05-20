@@ -174,7 +174,7 @@ public class MainGamePanel extends SurfaceView implements
 				+ scaleHeight + ".");
 		
 		//initialize buttons
-		buttons.add(new Button(myContext, 1, screenWidth/6, 5*screenHeight/6, scaleWidth, scaleHeight));
+		buttons.add(new Button(myContext, 1, screenWidth/6, 7*screenHeight/8, scaleWidth, scaleHeight));
 		
 		// --- initialise and scale wall 1
 		wall = new Wall(getContext(), 1, screenWidth/2, 2*screenHeight/3, scaleWidth, scaleHeight);
