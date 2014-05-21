@@ -88,4 +88,20 @@ public class MainThread extends Thread {
 		}
 		Log.d(TAG, "Thread ended!");
 	}
+
+	public static int getMaxFps() {
+		return MAX_FPS;
+	}
+
+	public static int getMaxFrameSkips() {
+		return MAX_FRAME_SKIPS;
+	}
+
+	public static int getFramePeriod() {
+		return FRAME_PERIOD;
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
 }

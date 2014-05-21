@@ -16,23 +16,14 @@ public class Enemy extends Actor {
 	private EnemyState enemyState;
 	private final String TAG = "Enemy";
 	public Enemy(Bitmap bitmap, int x, int y, float scaleWidth,
-			float scaleHeight) {
-		super(bitmap, x, y);
-		Log.d(TAG, "Ally bitmap unscaled width: " + bitmap.getWidth()
-				+ ", height: " + bitmap.getHeight());
-		bitmap = Bitmap.createScaledBitmap(bitmap,
-				(int) (bitmap.getWidth() * scaleWidth),
-				(int) (bitmap.getHeight() * scaleHeight), true);
-		this.width = bitmap.getWidth();
-		this.height = bitmap.getHeight();
-		Log.d(TAG, "Ally bitmap scaled width: " + this.width + ", height: "
-				+ this.height);
+			float scaleHeight, int fps) {
+		super(bitmap, x, y, scaleHeight, scaleWidth, fps);
 		this.xSpeed = -2;
 		this.ySpeed = 0;
 		this.enemyState = EnemyState.moving;
 		this.health = 50;
 		this.damage = 10;
-		this.body = new Rect(x, y, x + width, y + width);
+		this.body = new Rect(x, y - height, x + width, y);
 	}
 
 	public void update(ArrayList<Ally> allies, Wall wall) {

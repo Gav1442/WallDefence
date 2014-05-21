@@ -15,17 +15,8 @@ public class Ally extends Actor {
 	protected final String TAG = "Ally";
 	protected boolean onTopOfWall;
 
-	public Ally(Bitmap bitmap, int x, int y, float scaleWidth, float scaleHeight, boolean onTopOfWall) {
-		super(bitmap, x, y);
-		Log.d(TAG, "Ally bitmap unscaled width: " + bitmap.getWidth()
-				+ ", height: " + bitmap.getHeight());
-		bitmap = Bitmap.createScaledBitmap(bitmap,
-				(int) (bitmap.getWidth() * scaleWidth),
-				(int) (bitmap.getHeight() * scaleHeight), true);
-		this.width = bitmap.getWidth();
-		this.height = bitmap.getHeight();
-		Log.d(TAG, "Ally bitmap scaled width: " + this.width + ", height: "
-				+ this.height);
+	public Ally(Bitmap bitmap, int x, int y, float scaleWidth, float scaleHeight, int fps, boolean onTopOfWall) {
+		super(bitmap, x, y, scaleHeight, scaleWidth, fps);
 		this.xSpeed = 3;
 		this.ySpeed = 0;
 		this.onTopOfWall = onTopOfWall;

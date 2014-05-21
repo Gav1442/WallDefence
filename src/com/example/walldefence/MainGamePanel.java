@@ -64,6 +64,7 @@ public class MainGamePanel extends SurfaceView implements
 			//check for intersect (testing for now)
 		}
 		// ACTION_MOVE matters when moving the whole screen/view
+		//Figure out why button not reselected if touch MOVES back onto it ******
 		if (event.getAction() == MotionEvent.ACTION_MOVE) {
 			int xCurrent = (int) event.getX();
 			int yCurrent = (int) event.getY();
@@ -115,7 +116,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void createAlly(int buttonID, boolean onTopOfWall){
 		//Will have to turn intp a switch statement later depending on buttonID
-		allies.add(new Ally(BitmapFactory.decodeResource(getResources(), R.drawable.temp_soldier), 10, 2*screenHeight/3, scaleWidth, scaleHeight, onTopOfWall));
+		allies.add(new Ally(BitmapFactory.decodeResource(getResources(), R.drawable.temp_soldier), 10, 2*screenHeight/3, scaleWidth, scaleHeight, thread.getMaxFps(), onTopOfWall));
 	}
 	
 	public void update() {
@@ -183,7 +184,7 @@ public class MainGamePanel extends SurfaceView implements
 		
 		// -- initialize and scale test ally
 		Bitmap testBitmap = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.temp_soldier);
-		enemies.add(new Enemy(BitmapFactory.decodeResource(myContext.getResources(), R.drawable.temp_soldier), screenWidth - 10, 2*screenHeight/3, scaleWidth, scaleHeight));		
+		enemies.add(new Enemy(BitmapFactory.decodeResource(myContext.getResources(), R.drawable.temp_soldier), screenWidth - 10, 2*screenHeight/3, scaleWidth, scaleHeight, thread.getMaxFps()));		
 		// call function to resize existing and set scales...
 		// or maybe don't initialize walls until now instead of onCreate and
 		// pass scale values to them
