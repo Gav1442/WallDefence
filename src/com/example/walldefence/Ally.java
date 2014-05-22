@@ -15,8 +15,9 @@ public class Ally extends Actor {
 	protected final String TAG = "Ally";
 	protected boolean onTopOfWall;
 
-	public Ally(Bitmap bitmap, int x, int y, float scaleWidth, float scaleHeight, int fps, boolean onTopOfWall) {
-		super(bitmap, x, y, scaleHeight, scaleWidth, fps);
+	public Ally(Bitmap bitmap, int x, int y, float scaleWidth,
+			float scaleHeight, int fps, boolean onTopOfWall) {
+		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 12);
 		this.xSpeed = 3;
 		this.ySpeed = 0;
 		this.onTopOfWall = onTopOfWall;
@@ -26,13 +27,26 @@ public class Ally extends Actor {
 		this.body = new Rect(x, y - height, x + width, y);
 	}
 
-	public void update(ArrayList<Enemy> enemies, Wall wall) {
-		checkEnemyCollision(enemies); // check enemies first so if unit is done attacking they will next check if they are at wall
+	public void update(ArrayList<Enemy> enemies, Wall wall, long gameTime) {
+		checkEnemyCollision(enemies); // check enemies first so if unit is done
+										// attacking they will next check if
+										// they are at wall
 		checkWallCollision(wall);
 		if (allyState == AllyState.moving) {
 			x += xSpeed;
 			y += ySpeed;
 		}
+		if (gameTime > frameTicker + framePeriod) {
+			frameTicker = gameTime;
+			// increment the frame
+			currentFrame++;
+			if (currentFrame >= numberOfFrames) {
+				currentFrame = 0;
+			}
+		}
+		// define the rectangle to cut out sprite
+		this.srcRect.left = currentFrame * width;
+		this.srcRect.right = this.srcRect.left + width;
 		body.set(x, y - height, x + width, y);
 	}
 
@@ -70,7 +84,7 @@ public class Ally extends Actor {
 					x += (x + width + xSpeed) - enemies.get(spot).getX();
 					if (attackEnemy(enemies.get(spot))) {
 						enemies.remove(spot);
-						Log.d(TAG,"Enemy Destroyed!");
+						Log.d(TAG, "Enemy Destroyed!");
 					}
 					allyState = AllyState.attackingEnemy;
 					attacked = true;

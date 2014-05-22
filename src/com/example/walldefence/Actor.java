@@ -17,25 +17,29 @@ public class Actor {
 	protected boolean ranged;
 	protected Rect srcRect, body; // Implement Rect in the morning. Probably makes
 							// collision detection easier!
-	private int numberOfFrames, currentFrame, framePeriod;
-	private long frameTicker;
+    protected int numberOfFrames;
+	protected int currentFrame;
+	protected int framePeriod;
+	protected long frameTicker;
 	
-	public Actor(Bitmap bitmap, int x, int y, float scaleHeight, float scaleWidth, int fps) {
+	public Actor(Bitmap bitmap, int x, int y, float scaleHeight, float scaleWidth, int fps, int frameCount) {
 		Log.d(TAG, "Unit bitmap unscaled width: " + bitmap.getWidth()
 				+ ", height: " + bitmap.getHeight());
 		//create scaled version of bitmap (parameter) and allocate it to the Actor's bitmap.
 		this.bitmap = Bitmap.createScaledBitmap(bitmap,
 				(int) (bitmap.getWidth() * scaleWidth),
 				(int) (bitmap.getHeight() * scaleHeight), true);
-		this.width = this.bitmap.getWidth();
+		this.currentFrame = 0;
+		this.numberOfFrames = frameCount;
+		this.width = this.bitmap.getWidth()/frameCount;
 		this.height = this.bitmap.getHeight();
 		Log.d(TAG, "Unit bitmap scaled width: " + this.width + ", height: "
 				+ this.height);
-		
+		this.srcRect = new Rect(0,0, this.width, this.height); //Rect for selecting the frame
+		this.framePeriod = 1000 / fps;
+		this.frameTicker = 0l;
 		this.x = x;
-		this.y = y;
-		srcRect = new Rect(0,0, this.width, this.height); //Rect for selecting the frame
-		
+		this.y = y;		
 	}
 	//Still need to set srcRect
 	public void drawBitmap(Canvas canvas) {
