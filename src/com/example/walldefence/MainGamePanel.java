@@ -117,7 +117,7 @@ public class MainGamePanel extends SurfaceView implements
 	public void createAlly(int buttonID, boolean onTopOfWall){
 		//Will have to turn intp a switch statement later depending on buttonID
 		//change back from piggy
-		allies.add(new Ally(BitmapFactory.decodeResource(getResources(), R.drawable.piggy), 10, 2*screenHeight/3, scaleWidth, scaleHeight, thread.getMaxFps(), onTopOfWall));
+		allies.add(new Ally(BitmapFactory.decodeResource(getResources(), R.drawable.elaine), 10, 2*screenHeight/3, scaleWidth, scaleHeight, thread.getMaxFps(), onTopOfWall));
 	}
 	
 	public void update() {

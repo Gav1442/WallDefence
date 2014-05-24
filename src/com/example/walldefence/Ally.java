@@ -17,7 +17,7 @@ public class Ally extends Actor {
 
 	public Ally(Bitmap bitmap, int x, int y, float scaleWidth,
 			float scaleHeight, int fps, boolean onTopOfWall) {
-		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 12);
+		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 5);
 		this.xSpeed = 3;
 		this.ySpeed = 0;
 		this.onTopOfWall = onTopOfWall;
