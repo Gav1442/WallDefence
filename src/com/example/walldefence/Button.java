@@ -78,11 +78,13 @@ public class Button {
 		//if the button is already 'touched' then the two are visible and touch moving on image should keep image
 		if(touch_down){
 			if(fullBody.contains((int)e.getX(), (int)e.getY())) return true;
+		}else{
+			if (body.contains((int)e.getX(), (int)e.getY())) return true;
 		}
 		return false;
 	}
 	
-	public boolean touchUpIntersects(MotionEvent e, ArrayList<Ally> allies){
+	public boolean touchUpIntersects(MotionEvent e){
 		Rect fullBody = new Rect(body);
 		fullBody.top = fullBody.top - this.height;
 		//if the button is already 'touched' then the two are visible and touch moving on image should keep image

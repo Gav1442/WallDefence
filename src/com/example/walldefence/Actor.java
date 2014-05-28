@@ -22,6 +22,8 @@ public class Actor {
 	protected int framePeriod;
 	protected long frameTicker;
 	
+	//Look into integrating CP317 stuff into development.
+	//Figure out attacking delay for animation and damage dealing.
 	public Actor(Bitmap bitmap, int x, int y, float scaleHeight, float scaleWidth, int fps, int frameCount) {
 		Log.d(TAG, "Unit bitmap unscaled width: " + bitmap.getWidth()
 				+ ", height: " + bitmap.getHeight());

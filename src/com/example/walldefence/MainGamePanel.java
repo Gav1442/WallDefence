@@ -98,7 +98,7 @@ public class MainGamePanel extends SurfaceView implements
 			//check for intersect (testing for now)
 			if(button_touch){
 				for(int i = 0; i < buttons.size(); i++){
-					if(buttons.get(i).touchUpIntersects(event, allies)){
+					if(buttons.get(i).touchUpIntersects(event)){
 						buttons.get(i).setTouch_down(false);
 						if(buttons.get(i).getBody().contains((int)event.getX(), (int)event.getY())){
 							createAlly(buttons.get(i).getButtonNumber(), false);
@@ -116,7 +116,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void createAlly(int buttonID, boolean onTopOfWall){
 		//Will have to turn intp a switch statement later depending on buttonID
-		//change back from piggy
+		// GET SPRITESHEET FROM ANDREW AND WORK AROUND THAT
 		allies.add(new Ally(BitmapFactory.decodeResource(getResources(), R.drawable.elaine), 10, 2*screenHeight/3, scaleWidth, scaleHeight, thread.getMaxFps(), onTopOfWall));
 	}
 	
