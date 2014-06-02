@@ -9,7 +9,7 @@ import android.util.Log;
 
 public class Actor {
 	// Turn these into wc points and make screen coordinate points as well
-	protected int x, y, width, height, range;
+	protected int x, y, width, height, range, bitmapRow;
 	protected int health, damage;
 	protected int xSpeed, ySpeed;
 	protected Bitmap bitmap;
@@ -17,14 +17,15 @@ public class Actor {
 	protected boolean ranged;
 	protected Rect srcRect, body; // Implement Rect in the morning. Probably makes
 							// collision detection easier!
-    protected int numberOfFrames;
+    protected int numberOfFramesWidth, numberOfFramesHeight;
 	protected int currentFrame;
 	protected int framePeriod;
 	protected long frameTicker;
+	protected boolean attackedThisRound;
 	
 	//Look into integrating CP317 stuff into development.
 	//Figure out attacking delay for animation and damage dealing.
-	public Actor(Bitmap bitmap, int x, int y, float scaleHeight, float scaleWidth, int fps, int frameCount) {
+	public Actor(Bitmap bitmap, int x, int y, float scaleHeight, float scaleWidth, int fps, int frameCountW, int frameCountH) {
 		Log.d(TAG, "Unit bitmap unscaled width: " + bitmap.getWidth()
 				+ ", height: " + bitmap.getHeight());
 		//create scaled version of bitmap (parameter) and allocate it to the Actor's bitmap.
@@ -32,16 +33,19 @@ public class Actor {
 				(int) (bitmap.getWidth() * scaleWidth),
 				(int) (bitmap.getHeight() * scaleHeight), true);
 		this.currentFrame = 0;
-		this.numberOfFrames = frameCount;
-		this.width = this.bitmap.getWidth()/frameCount;
-		this.height = this.bitmap.getHeight();
+		this.bitmapRow = 0; //Sets bitmap row to top row which is moving (start at 0)
+		this.numberOfFramesWidth = frameCountW;
+		this.width = this.bitmap.getWidth()/frameCountW;
+		this.numberOfFramesHeight = frameCountH;
+		this.height = this.bitmap.getHeight()/frameCountH;
 		Log.d(TAG, "Unit bitmap scaled width: " + this.width + ", height: "
 				+ this.height);
 		this.srcRect = new Rect(0,0, this.width, this.height); //Rect for selecting the frame
 		this.framePeriod = 1000 / fps;
 		this.frameTicker = 0l;
 		this.x = x;
-		this.y = y;		
+		this.y = y;
+		attackedThisRound = false;
 	}
 	//Still need to set srcRect
 	public void drawBitmap(Canvas canvas) {

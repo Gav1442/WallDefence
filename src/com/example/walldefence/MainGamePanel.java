@@ -33,10 +33,12 @@ public class MainGamePanel extends SurfaceView implements
 		// adding the callback (this) to the surface holder to intercept events
 		getHolder().addCallback(this);
 		myContext = context;
-		/*allies.add(new Ally(BitmapFactory.decodeResource(
-				context.getResources(), R.drawable.greenman), 10, 20));
-		wall = new Wall(getContext(), 1, 400, 20); */
-		
+		/*
+		 * allies.add(new Ally(BitmapFactory.decodeResource(
+		 * context.getResources(), R.drawable.greenman), 10, 20)); wall = new
+		 * Wall(getContext(), 1, 400, 20);
+		 */
+
 		// make the GamePanel focusable so it can handle events
 		thread = new MainThread(getHolder(), this);
 		setFocusable(true);
@@ -49,77 +51,83 @@ public class MainGamePanel extends SurfaceView implements
 
 	// Handle touch events here.
 	public boolean onTouchEvent(MotionEvent event) {
-		Log.d(TAG, "x: " + event.getX() + ", Y: " + event.getY() + ".");
-		// ACTION_DOWN matters when calling a new unit.
-		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			// set beginning touch point
-			xBegin = (int) event.getX();
-			yBegin = (int) event.getX();
-			for(int i = 0; i < buttons.size(); i++){
-				if(buttons.get(i).touchDownIntersects(event)){
-					buttons.get(i).setTouch_down(true);
-					button_touch = true;
-				}
-			}
-			//check for intersect (testing for now)
-		}
-		// ACTION_MOVE matters when moving the whole screen/view
-		//Figure out why button not reselected if touch MOVES back onto it ******
-		if (event.getAction() == MotionEvent.ACTION_MOVE) {
-			int xCurrent = (int) event.getX();
-			int yCurrent = (int) event.getY();
-			/*
-			// move screen
-			Log.d(TAG, "Screen is moving!");
-			int xCurrent = (int) event.getX();
-			// ------ Create function that cycles through all on the field and
-			// shifts properly (calling shitWall etc...)----
-			wall.shiftWall(xCurrent - xBegin);
-			xBegin = xCurrent;
-			Log.d(TAG,
-					"New position is x:" + wall.getX() + " and y:"
-							+ wall.getY() + "!");
-							*/
-			if(button_touch){
-				for(int i = 0; i < buttons.size(); i++){
-					if(buttons.get(i).touchMoveIntersects(event)){
+		if (loaded) {
+			Log.d(TAG, "x: " + event.getX() + ", Y: " + event.getY() + ".");
+			// ACTION_DOWN matters when calling a new unit.
+			if (event.getAction() == MotionEvent.ACTION_DOWN) {
+				// set beginning touch point
+				xBegin = (int) event.getX();
+				yBegin = (int) event.getX();
+				for (int i = 0; i < buttons.size(); i++) {
+					if (buttons.get(i).touchDownIntersects(event)) {
 						buttons.get(i).setTouch_down(true);
+						button_touch = true;
 					}
-					else{
-						buttons.get(i).setTouch_down(false);
+				}
+				// check for intersect (testing for now)
+			}
+			// ACTION_MOVE matters when moving the whole screen/view
+			// Figure out why button not reselected if touch MOVES back onto it
+			// ******
+			if (event.getAction() == MotionEvent.ACTION_MOVE) {
+				int xCurrent = (int) event.getX();
+				int yCurrent = (int) event.getY();
+				/*
+				 * // move screen Log.d(TAG, "Screen is moving!"); int xCurrent
+				 * = (int) event.getX(); // ------ Create function that cycles
+				 * through all on the field and // shifts properly (calling
+				 * shitWall etc...)---- wall.shiftWall(xCurrent - xBegin);
+				 * xBegin = xCurrent; Log.d(TAG, "New position is x:" +
+				 * wall.getX() + " and y:" + wall.getY() + "!");
+				 */
+				if (button_touch) {
+					for (int i = 0; i < buttons.size(); i++) {
+						if (buttons.get(i).touchMoveIntersects(event)) {
+							buttons.get(i).setTouch_down(true);
+						} else {
+							buttons.get(i).setTouch_down(false);
+						}
 					}
 				}
 			}
-		}
-		if (event.getAction() == MotionEvent.ACTION_UP) {
-			// clear x and y begins
-			xBegin = 0;
-			yBegin = 0;
-			//check for intersect (testing for now)
-			if(button_touch){
-				for(int i = 0; i < buttons.size(); i++){
-					if(buttons.get(i).touchUpIntersects(event)){
-						buttons.get(i).setTouch_down(false);
-						if(buttons.get(i).getBody().contains((int)event.getX(), (int)event.getY())){
-							createAlly(buttons.get(i).getButtonNumber(), false);
-						}
-						else{
-							createAlly(buttons.get(i).getButtonNumber(), true);
+			if (event.getAction() == MotionEvent.ACTION_UP) {
+				// clear x and y begins
+				xBegin = 0;
+				yBegin = 0;
+				// check for intersect (testing for now)
+				if (button_touch) {
+					for (int i = 0; i < buttons.size(); i++) {
+						if (buttons.get(i).touchUpIntersects(event)) {
+							buttons.get(i).setTouch_down(false);
+							if (buttons
+									.get(i)
+									.getBody()
+									.contains((int) event.getX(),
+											(int) event.getY())) {
+								createAlly(buttons.get(i).getButtonNumber(),
+										false);
+							} else {
+								createAlly(buttons.get(i).getButtonNumber(),
+										true);
+							}
 						}
 					}
+					button_touch = false;
 				}
-				button_touch = false;
 			}
 		}
 		return true;
+
 	}
 
-	public void createAlly(int buttonID, boolean onTopOfWall){
-		//Will have to turn intp a switch statement later depending on buttonID
+	public void createAlly(int buttonID, boolean onTopOfWall) {
+		// Will have to turn into a switch statement later depending on buttonID
 		// GET SPRITESHEET FROM ANDREW AND WORK AROUND THAT
-		allies.add(new Ally(BitmapFactory.decodeResource(getResources(), R.drawable.elaine), 10, 2*screenHeight/3, scaleWidth, scaleHeight, thread.getMaxFps(), onTopOfWall));
+		allies.add(new Ally(BitmapFactory.decodeResource(getResources(),
+				R.drawable.test_sprite), 10, 2 * screenHeight / 3, scaleWidth,
+				scaleHeight, thread.getMaxFps(), onTopOfWall));
 	}
-	
+
 	public void update() {
 		for (int spot = 0; spot < allies.size(); spot++) {
 			allies.get(spot).update(enemies, wall, System.currentTimeMillis());
@@ -127,7 +135,9 @@ public class MainGamePanel extends SurfaceView implements
 		for (int spot = 0; spot < enemies.size(); spot++) {
 			enemies.get(spot).update(allies, wall);
 		}
-		//should we sort enemy to make highest HP first so you are attacking highest priority target as opposed to what ever happens to be first in the list?	
+		// should we sort enemy to make highest HP first so you are attacking
+		// highest priority target as opposed to what ever happens to be first
+		// in the list?
 	}
 
 	public void render(Canvas canvas) {
@@ -141,12 +151,13 @@ public class MainGamePanel extends SurfaceView implements
 			for (int spot = 0; spot < enemies.size(); spot++) {
 				enemies.get(spot).drawBitmap(canvas);
 			}
-			for (int spot = 0; spot < buttons.size(); spot++){
+			for (int spot = 0; spot < buttons.size(); spot++) {
 				buttons.get(spot).drawBitmap(canvas);
 			}
 			Paint p = new Paint();
 			p.setColor(Color.BLACK);
-			canvas.drawLine(0, 2*screenHeight/3, screenWidth, 2*screenHeight/3, p);
+			canvas.drawLine(0, 2 * screenHeight / 3, screenWidth,
+					2 * screenHeight / 3, p);
 		}
 	}
 
@@ -160,13 +171,23 @@ public class MainGamePanel extends SurfaceView implements
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {		
+			int height) {
 		screenHeight = height;
 		screenWidth = width;
 		Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
 				+ screenHeight + ".");
-		scaleHeight = (float) screenHeight / (float) background.getHeight(); //scale reference for height of everything
-		scaleWidth = (float) screenWidth / (float) background.getWidth(); // scale reference for width of everything
+		scaleHeight = (float) screenHeight / (float) background.getHeight(); // scale
+																				// reference
+																				// for
+																				// height
+																				// of
+																				// everything
+		scaleWidth = (float) screenWidth / (float) background.getWidth(); // scale
+																			// reference
+																			// for
+																			// width
+																			// of
+																			// everything
 		// --- scale the background ---
 		background = Bitmap.createScaledBitmap(background, screenWidth,
 				screenHeight, true);
@@ -174,18 +195,26 @@ public class MainGamePanel extends SurfaceView implements
 				+ ", Background Height: " + background.getHeight() + ".");
 		Log.d(TAG, "Scale Width: " + scaleWidth + ", Scale Height: "
 				+ scaleHeight + ".");
-		
-		//initialize buttons
-		buttons.add(new Button(myContext, 1, screenWidth/6, 7*screenHeight/8, scaleWidth, scaleHeight));
-		
-		// --- initialise and scale wall 1
-		wall = new Wall(getContext(), 1, screenWidth/2, 2*screenHeight/3, scaleWidth, scaleHeight);
+
+		// initialize buttons
+		buttons.add(new Button(myContext, 1, screenWidth / 6,
+				7 * screenHeight / 8, scaleWidth, scaleHeight));
+		buttons.add(new Button(myContext, 2, screenWidth / 6,
+				7 * screenHeight / 8, scaleWidth, scaleHeight));
+
+		// --- initialize and scale wall 1
+		wall = new Wall(getContext(), 1, screenWidth / 2, 2 * screenHeight / 3,
+				scaleWidth, scaleHeight);
 		Log.d(TAG, "Unscaled - Wall Width: " + wall.getWidth()
 				+ ", Wall Height: " + wall.getHeight() + ".");
-		
+
 		// -- initialize and scale test ally
-		Bitmap testBitmap = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.temp_soldier);
-		enemies.add(new Enemy(BitmapFactory.decodeResource(myContext.getResources(), R.drawable.temp_soldier), screenWidth - 10, 2*screenHeight/3, scaleWidth, scaleHeight, thread.getMaxFps()));		
+		Bitmap testBitmap = BitmapFactory.decodeResource(
+				myContext.getResources(), R.drawable.temp_soldier);
+		enemies.add(new Enemy(BitmapFactory.decodeResource(
+				myContext.getResources(), R.drawable.temp_soldier),
+				screenWidth - 10, 2 * screenHeight / 3, scaleWidth,
+				scaleHeight, thread.getMaxFps()));
 		// call function to resize existing and set scales...
 		// or maybe don't initialize walls until now instead of onCreate and
 		// pass scale values to them
@@ -194,7 +223,6 @@ public class MainGamePanel extends SurfaceView implements
 		// this may fix the issue of crashing...
 		loaded = true;
 	}
-
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {

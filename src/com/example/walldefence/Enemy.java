@@ -17,7 +17,7 @@ public class Enemy extends Actor {
 	private final String TAG = "Enemy";
 	public Enemy(Bitmap bitmap, int x, int y, float scaleWidth,
 			float scaleHeight, int fps) {
-		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 1);
+		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 1, 1);
 		this.xSpeed = -2;
 		this.ySpeed = 0;
 		this.enemyState = EnemyState.moving;

@@ -22,17 +22,32 @@ public class Button {
 	public Button(Context myContext, int buttonNumber, int x, int y, float scaleWidth, float scaleHeight){
 		this.buttonNumber = buttonNumber;
 		this.getBitmaps(this.buttonNumber, myContext, scaleWidth, scaleHeight);
-		this.x = x;
-		this.y = y;
 		this.buttonNumber = buttonNumber;
 		this.width = main_button.getWidth();
 		this.height = main_button.getHeight();
-		this.body = new Rect(x, y-height, x+width, y);
+		this.x = x + (this.buttonNumber-1)*this.width;
+		this.y = y;
+		this.body = new Rect(this.x, this.y-height, this.x+width, this.y);
 	}
 	
 	public void getBitmaps(int buttonNumber, Context myContext, float scaleWidth, float scaleHeight){
 		switch(buttonNumber){
 		case 1:
+			main_button = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button);
+			main_button = Bitmap.createScaledBitmap(main_button,
+					(int) (main_button.getWidth() * scaleWidth),
+					(int) (main_button.getHeight() * scaleHeight), true);
+			//--- Update with proper images ---
+			touch_ground = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button);
+			touch_ground = Bitmap.createScaledBitmap(touch_ground,
+					(int) (touch_ground.getWidth() * scaleWidth),
+					(int) (touch_ground.getHeight() * scaleHeight), true);
+			touch_onWall = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button);
+			touch_onWall = Bitmap.createScaledBitmap(touch_onWall,
+					(int) (touch_onWall.getWidth() * scaleWidth),
+					(int) (touch_onWall.getHeight() * scaleHeight), true);
+			break;
+		case 2:
 			main_button = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button);
 			main_button = Bitmap.createScaledBitmap(main_button,
 					(int) (main_button.getWidth() * scaleWidth),

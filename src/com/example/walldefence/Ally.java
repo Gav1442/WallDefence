@@ -17,14 +17,17 @@ public class Ally extends Actor {
 
 	public Ally(Bitmap bitmap, int x, int y, float scaleWidth,
 			float scaleHeight, int fps, boolean onTopOfWall) {
-		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 5);
+		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 5, 2);
 		this.xSpeed = 3;
 		this.ySpeed = 0;
 		this.onTopOfWall = onTopOfWall;
 		this.health = 10000;
-		this.damage = 30;
+		this.damage = 10;
 		this.allyState = AllyState.moving;
 		this.body = new Rect(x, y - height, x + width, y);
+		this.srcRect = new Rect(0, 0, this.width, this.height); // Rect for
+																// selecting the
+																// frame
 	}
 
 	public void update(ArrayList<Enemy> enemies, Wall wall, long gameTime) {
@@ -40,13 +43,19 @@ public class Ally extends Actor {
 			frameTicker = gameTime;
 			// increment the frame
 			currentFrame++;
-			if (currentFrame >= numberOfFrames) {
+			if (currentFrame >= numberOfFramesWidth) {
+				if(allyState == AllyState.attackingEnemy){
+					attackEnemy(enemies);
+					attackedThisRound = true;
+				}
 				currentFrame = 0;
 			}
 		}
 		// define the rectangle to cut out sprite
 		this.srcRect.left = currentFrame * width;
 		this.srcRect.right = this.srcRect.left + width;
+		this.srcRect.top = 0 + this.height * this.bitmapRow;
+		this.srcRect.bottom = this.srcRect.top + height;
 		body.set(x, y - height, x + width, y);
 	}
 
@@ -82,11 +91,7 @@ public class Ally extends Actor {
 						.getBody())) {
 					Log.d(TAG, "AHA");
 					x += (x + width + xSpeed) - enemies.get(spot).getX();
-					if (attackEnemy(enemies.get(spot))) {
-						enemies.remove(spot);
-						Log.d(TAG, "Enemy Destroyed!");
-					}
-					allyState = AllyState.attackingEnemy;
+					setAllyAttacking();
 					attacked = true;
 				}
 				spot++;
@@ -100,45 +105,52 @@ public class Ally extends Actor {
 						+ width + xSpeed, y - ySpeed), enemies.get(spot)
 						.getBody())) {
 					Log.d(TAG, "AHA");
-					if (attackEnemy(enemies.get(spot))) {
-						enemies.remove(spot);
-					}
-					allyState = AllyState.attackingEnemy;
-					attacked = true;
-				}
-				spot++;
-			}
-		} else if (allyState == AllyState.attackingEnemy) {
-			int spot = 0;
-			while (spot < enemies.size() && !attacked) {
-				if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
-						+ width + xSpeed, y - ySpeed), enemies.get(spot)
-						.getBody())) {
-					Log.d(TAG, "AHA");
-					if (attackEnemy(enemies.get(spot))) {
-						enemies.remove(spot);
-					}
-					allyState = AllyState.attackingEnemy;
+					setAllyAttacking();
 					attacked = true;
 				}
 				spot++;
 			}
 		}
-		if (!attacked && allyState == AllyState.attackingEnemy) {
-			allyState = AllyState.moving;
-			Log.d(TAG, "Done Attacking!");
-		}
-
 	}
 
 	// Made actor so useable by both classes. Check for errors but should be
 	// alright
-	public boolean attackEnemy(Enemy target) {
+	public void attackEnemy(ArrayList<Enemy> enemies) {
 		Log.d(TAG, "Attacking!");
-		if (target.takeDamage(damage)) {
-			return true;
-		} else
-			return false;
+		boolean attacked = false;
+		int spot = 0;
+		while (spot < enemies.size() && !attacked) {
+			if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
+					+ width + xSpeed, y - ySpeed), enemies.get(spot).getBody())) {
+				Log.d(TAG, "AHA");
+				if (enemies.get(spot).takeDamage(damage)) {
+					enemies.remove(spot);
+					setAllyMoving();
+				}
+				// allyState = AllyState.attackingEnemy; <-- This line would
+				// pose a problem, already attacking. Otherwise killed enemy.
+				attacked = true;
+			}
+			spot++;
+		}
+		if (!attacked && allyState == AllyState.attackingEnemy) {
+			setAllyMoving();
+			Log.d(TAG, "Done Attacking!");
+		}
+	}
+
+	public void setAllyMoving() {
+		setAllyState(Ally.AllyState.moving);
+		bitmapRow = 0;
+		numberOfFramesWidth = 5;
+		currentFrame = 0;
+	}
+
+	public void setAllyAttacking() {
+		setAllyState(Ally.AllyState.attackingEnemy);
+		bitmapRow = 1;
+		numberOfFramesWidth = 5;
+		currentFrame = 0;
 	}
 
 	public AllyState getAllyState() {

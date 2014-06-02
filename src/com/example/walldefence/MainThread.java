@@ -41,8 +41,6 @@ public class MainThread extends Thread {
 		sleepTime = 0;
 
 		while (running) {
-			
-			
 			canvas = null;
 			// try locking the canvas for exclusive pixel editing
 			// in the surface
