@@ -21,7 +21,7 @@ public class Enemy extends Actor {
 		this.xSpeed = -2;
 		this.ySpeed = 0;
 		this.enemyState = EnemyState.moving;
-		this.health = 50;
+		this.health = 150;
 		this.damage = 10;
 		this.body = new Rect(x, y - height, x + width, y);
 	}

@@ -17,7 +17,7 @@ public class Ally extends Actor {
 
 	public Ally(Bitmap bitmap, int x, int y, float scaleWidth,
 			float scaleHeight, int fps, boolean onTopOfWall) {
-		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 5, 2);
+		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 5, 3);
 		this.xSpeed = 3;
 		this.ySpeed = 0;
 		this.onTopOfWall = onTopOfWall;
@@ -46,7 +46,6 @@ public class Ally extends Actor {
 			if (currentFrame >= numberOfFramesWidth) {
 				if(allyState == AllyState.attackingEnemy){
 					attackEnemy(enemies);
-					attackedThisRound = true;
 				}
 				currentFrame = 0;
 			}
@@ -63,7 +62,7 @@ public class Ally extends Actor {
 		// check to see if actor is colliding with wall.
 		// Log.d(TAG,"Front of character: " + (x+xSpeed+width) +
 		// ", edge of wall: " + wall.getX());
-		if (allyState != AllyState.attackingEnemy) {
+		if (allyState == AllyState.moving) {
 			if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
 					+ width + xSpeed, y - ySpeed), wall.getStructure())) {
 				// Log.d(TAG,"Character x: " + x);
@@ -72,7 +71,7 @@ public class Ally extends Actor {
 				// x += (x+width+xSpeed) - wall.getX();
 				// Log.d(TAG,"L:" + x + ", T:" + (y-height) + ", R:" + (x+width)
 				// + ", B:" + y);
-				this.setAllyState(AllyState.atWall);
+				setAllyAtWall();
 			}
 		}
 	}
@@ -87,10 +86,12 @@ public class Ally extends Actor {
 			while (spot < enemies.size() && !attacked) {
 				// Check if enemy is within next "step" and within range
 				if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
-						+ width + xSpeed, y - ySpeed), enemies.get(spot)
+						+ width + xSpeed + range, y - ySpeed), enemies.get(spot)
 						.getBody())) {
-					Log.d(TAG, "AHA");
-					x += (x + width + xSpeed) - enemies.get(spot).getX();
+					Log.d(TAG, "AHA Range: " + this.range);
+					if(x+width+range < enemies.get(spot).getX()){
+						x += (x + width + xSpeed + range) - enemies.get(spot).getX();
+					}
 					setAllyAttacking();
 					attacked = true;
 				}
@@ -102,7 +103,7 @@ public class Ally extends Actor {
 				// Means wall is destroyed (or on top ofwall) as enemy is coming
 				// through
 				if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
-						+ width + xSpeed, y - ySpeed), enemies.get(spot)
+						+ width + xSpeed+range, y - ySpeed), enemies.get(spot)
 						.getBody())) {
 					Log.d(TAG, "AHA");
 					setAllyAttacking();
@@ -113,19 +114,27 @@ public class Ally extends Actor {
 		}
 	}
 
-	// Made actor so useable by both classes. Check for errors but should be
-	// alright
+	// Made actor so usable by both classes. Check for errors but should be alright
 	public void attackEnemy(ArrayList<Enemy> enemies) {
 		Log.d(TAG, "Attacking!");
 		boolean attacked = false;
 		int spot = 0;
 		while (spot < enemies.size() && !attacked) {
 			if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
-					+ width + xSpeed, y - ySpeed), enemies.get(spot).getBody())) {
+					+ width + xSpeed + range, y - ySpeed), enemies.get(spot).getBody())) {
 				Log.d(TAG, "AHA");
+				if(!ranged){
 				if (enemies.get(spot).takeDamage(damage)) {
 					enemies.remove(spot);
 					setAllyMoving();
+				}
+				}
+				else{
+					//Change to adding a projectile to projectile ArrayList
+					if (enemies.get(spot).takeDamage(damage)) {
+						enemies.remove(spot);
+						setAllyMoving();
+					}	
 				}
 				// allyState = AllyState.attackingEnemy; <-- This line would
 				// pose a problem, already attacking. Otherwise killed enemy.
@@ -152,7 +161,14 @@ public class Ally extends Actor {
 		numberOfFramesWidth = 5;
 		currentFrame = 0;
 	}
-
+	
+	public void setAllyAtWall() {
+		setAllyState(Ally.AllyState.atWall);
+		bitmapRow = 2;
+		numberOfFramesWidth = 5;
+		currentFrame = 0;
+	}
+	
 	public AllyState getAllyState() {
 		return allyState;
 	}

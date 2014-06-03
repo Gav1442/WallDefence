@@ -123,9 +123,20 @@ public class MainGamePanel extends SurfaceView implements
 	public void createAlly(int buttonID, boolean onTopOfWall) {
 		// Will have to turn into a switch statement later depending on buttonID
 		// GET SPRITESHEET FROM ANDREW AND WORK AROUND THAT
-		allies.add(new Ally(BitmapFactory.decodeResource(getResources(),
-				R.drawable.test_sprite), 10, 2 * screenHeight / 3, scaleWidth,
-				scaleHeight, thread.getMaxFps(), onTopOfWall));
+		switch (buttonID) {
+		case 1:
+			allies.add(new AllySoldier(BitmapFactory.decodeResource(getResources(),
+					R.drawable.test_sprite), 10, 2 * screenHeight / 3,
+					scaleWidth, scaleHeight, thread.getMaxFps(), onTopOfWall));
+			break;
+		case 2:
+			allies.add(new AllyArcher(BitmapFactory.decodeResource(getResources(),
+					R.drawable.test_archer_sprite), 10, 2 * screenHeight / 3,
+					scaleWidth, scaleHeight, thread.getMaxFps(), onTopOfWall));
+			break;
+		default:
+			Log.d(TAG, "Error creating enemy - No case for buttonID: " + buttonID);
+		}
 	}
 
 	public void update() {
@@ -176,18 +187,10 @@ public class MainGamePanel extends SurfaceView implements
 		screenWidth = width;
 		Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
 				+ screenHeight + ".");
-		scaleHeight = (float) screenHeight / (float) background.getHeight(); // scale
-																				// reference
-																				// for
-																				// height
-																				// of
-																				// everything
-		scaleWidth = (float) screenWidth / (float) background.getWidth(); // scale
-																			// reference
-																			// for
-																			// width
-																			// of
-																			// everything
+		// scale reference for height of everything
+		scaleHeight = (float) screenHeight / (float) background.getHeight();
+		// scale reference for width of everything
+		scaleWidth = (float) screenWidth / (float) background.getWidth();
 		// --- scale the background ---
 		background = Bitmap.createScaledBitmap(background, screenWidth,
 				screenHeight, true);

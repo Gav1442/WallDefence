@@ -48,16 +48,16 @@ public class Button {
 					(int) (touch_onWall.getHeight() * scaleHeight), true);
 			break;
 		case 2:
-			main_button = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button);
+			main_button = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button2);
 			main_button = Bitmap.createScaledBitmap(main_button,
 					(int) (main_button.getWidth() * scaleWidth),
 					(int) (main_button.getHeight() * scaleHeight), true);
 			//--- Update with proper images ---
-			touch_ground = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button);
+			touch_ground = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button2);
 			touch_ground = Bitmap.createScaledBitmap(touch_ground,
 					(int) (touch_ground.getWidth() * scaleWidth),
 					(int) (touch_ground.getHeight() * scaleHeight), true);
-			touch_onWall = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button);
+			touch_onWall = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.button2);
 			touch_onWall = Bitmap.createScaledBitmap(touch_onWall,
 					(int) (touch_onWall.getWidth() * scaleWidth),
 					(int) (touch_onWall.getHeight() * scaleHeight), true);

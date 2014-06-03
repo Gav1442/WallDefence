@@ -21,7 +21,6 @@ public class Actor {
 	protected int currentFrame;
 	protected int framePeriod;
 	protected long frameTicker;
-	protected boolean attackedThisRound;
 	
 	//Look into integrating CP317 stuff into development.
 	//Figure out attacking delay for animation and damage dealing.
@@ -45,7 +44,6 @@ public class Actor {
 		this.frameTicker = 0l;
 		this.x = x;
 		this.y = y;
-		attackedThisRound = false;
 	}
 	//Still need to set srcRect
 	public void drawBitmap(Canvas canvas) {
