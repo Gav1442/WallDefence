@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.Log;
 
+//Base for all units.
 public class Ally extends Actor {
 	public enum AllyState {
 		moving, atWall, attackingEnemy;

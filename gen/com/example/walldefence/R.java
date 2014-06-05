@@ -31,8 +31,9 @@ public final class R {
         public static final int piggy=0x7f020007;
         public static final int temp_soldier=0x7f020008;
         public static final int test_archer_sprite=0x7f020009;
-        public static final int test_sprite=0x7f02000a;
-        public static final int wall_image1=0x7f02000b;
+        public static final int test_arrow=0x7f02000a;
+        public static final int test_sprite=0x7f02000b;
+        public static final int wall_image1=0x7f02000c;
     }
     public static final class id {
         public static final int MMContinue=0x7f080002;
