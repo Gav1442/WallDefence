@@ -152,7 +152,9 @@ public class MainGamePanel extends SurfaceView implements
 	}
 
 	public void render(Canvas canvas) {
+		//create a render for main menu and upgrade menu
 		if (loaded == true) {
+			Log.d(TAG, "Loaded is: " + loaded);
 			canvas.drawColor(Color.BLACK);
 			canvas.drawBitmap(background, 0, 0, null);
 			wall.drawBitmap(canvas);
@@ -170,6 +172,49 @@ public class MainGamePanel extends SurfaceView implements
 			canvas.drawLine(0, 2 * screenHeight / 3, screenWidth,
 					2 * screenHeight / 3, p);
 		}
+		else{
+			Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
+					+ screenHeight + ".");
+			// scale reference for height of everything
+			scaleHeight = (float) screenHeight / (float) background.getHeight();
+			// scale reference for width of everything
+			scaleWidth = (float) screenWidth / (float) background.getWidth();
+			// --- scale the background ---
+			background = Bitmap.createScaledBitmap(background, screenWidth,
+					screenHeight, true);
+			Log.d(TAG, "Scaled - Background Width: " + background.getWidth()
+					+ ", Background Height: " + background.getHeight() + ".");
+			Log.d(TAG, "Scale Width: " + scaleWidth + ", Scale Height: "
+					+ scaleHeight + ".");
+
+			// initialize buttons
+			buttons.add(new Button(myContext, 1, screenWidth / 6,
+					7 * screenHeight / 8, scaleWidth, scaleHeight));
+			buttons.add(new Button(myContext, 2, screenWidth / 6,
+					7 * screenHeight / 8, scaleWidth, scaleHeight));
+
+			// --- initialize and scale wall 1
+			wall = new Wall(getContext(), 1, screenWidth / 2, 2 * screenHeight / 3,
+					scaleWidth, scaleHeight);
+			Log.d(TAG, "Unscaled - Wall Width: " + wall.getWidth()
+					+ ", Wall Height: " + wall.getHeight() + ".");
+
+			// -- initialize and scale test ally
+			Bitmap testBitmap = BitmapFactory.decodeResource(
+					myContext.getResources(), R.drawable.temp_soldier);
+			enemies.add(new Enemy(BitmapFactory.decodeResource(
+					myContext.getResources(), R.drawable.temp_soldier),
+					screenWidth - 10, 2 * screenHeight / 3, scaleWidth,
+					scaleHeight, thread.getMaxFps()));
+			// call function to resize existing and set scales...
+			// or maybe don't initialize walls until now instead of onCreate and
+			// pass scale values to them
+			// set a boolean in the initial resize to true so that the draw function
+			// only gets called after that
+			// this may fix the issue of crashing...
+			Log.d(TAG, "Loaded is: " + loaded);
+			loaded = true;
+		}
 	}
 
 	private void displayFps(Canvas canvas, String fps) {
@@ -185,7 +230,7 @@ public class MainGamePanel extends SurfaceView implements
 			int height) {
 		screenHeight = height;
 		screenWidth = width;
-		Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
+		/*Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
 				+ screenHeight + ".");
 		// scale reference for height of everything
 		scaleHeight = (float) screenHeight / (float) background.getHeight();
@@ -225,6 +270,7 @@ public class MainGamePanel extends SurfaceView implements
 		// only gets called after that
 		// this may fix the issue of crashing...
 		loaded = true;
+		*/
 	}
 
 	@Override
