@@ -25,7 +25,7 @@ public class MainGamePanel extends SurfaceView implements
 	private int screenHeight, screenWidth, xBegin, yBegin;
 	private float scaleWidth, scaleHeight;
 	private Bitmap background;
-	private boolean loaded = false, button_touch = false;
+	private boolean loaded = false, button_touch = false, blnMainMenu = true, blnUpgradeMenu = false, blnInGame = false;
 	private Context myContext;
 
 	public MainGamePanel(Context context) {
@@ -42,11 +42,6 @@ public class MainGamePanel extends SurfaceView implements
 		// make the GamePanel focusable so it can handle events
 		thread = new MainThread(getHolder(), this);
 		setFocusable(true);
-		background = BitmapFactory.decodeResource(context.getResources(),
-				R.drawable.game);
-		Log.d(TAG, "Unscaled - Background Width: " + background.getWidth()
-				+ ", Background Height: " + background.getHeight() + ".");
-
 	}
 
 	// Handle touch events here.
@@ -154,7 +149,6 @@ public class MainGamePanel extends SurfaceView implements
 	public void render(Canvas canvas) {
 		//create a render for main menu and upgrade menu
 		if (loaded == true) {
-			Log.d(TAG, "Loaded is: " + loaded);
 			canvas.drawColor(Color.BLACK);
 			canvas.drawBitmap(background, 0, 0, null);
 			wall.drawBitmap(canvas);
@@ -173,6 +167,10 @@ public class MainGamePanel extends SurfaceView implements
 					2 * screenHeight / 3, p);
 		}
 		else{
+			background = BitmapFactory.decodeResource(myContext.getResources(),
+					R.drawable.game);
+			Log.d(TAG, "Unscaled - Background Width: " + background.getWidth()
+					+ ", Background Height: " + background.getHeight() + ".");
 			Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
 					+ screenHeight + ".");
 			// scale reference for height of everything
@@ -186,7 +184,7 @@ public class MainGamePanel extends SurfaceView implements
 					+ ", Background Height: " + background.getHeight() + ".");
 			Log.d(TAG, "Scale Width: " + scaleWidth + ", Scale Height: "
 					+ scaleHeight + ".");
-
+			/*
 			// initialize buttons
 			buttons.add(new Button(myContext, 1, screenWidth / 6,
 					7 * screenHeight / 8, scaleWidth, scaleHeight));
@@ -212,6 +210,8 @@ public class MainGamePanel extends SurfaceView implements
 			// set a boolean in the initial resize to true so that the draw function
 			// only gets called after that
 			// this may fix the issue of crashing...
+			 *
+			 */
 			Log.d(TAG, "Loaded is: " + loaded);
 			loaded = true;
 		}
