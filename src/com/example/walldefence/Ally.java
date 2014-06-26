@@ -89,7 +89,7 @@ public class Ally extends Actor {
 				if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
 						+ width + xSpeed + range, y - ySpeed), enemies.get(spot)
 						.getBody())) {
-					Log.d(TAG, "AHA Range: " + this.range);
+					//Log.d(TAG, "AHA Range: " + this.range);
 					if(x+width+range < enemies.get(spot).getX()){
 						x += (x + width + xSpeed + range) - enemies.get(spot).getX();
 					}
@@ -106,7 +106,7 @@ public class Ally extends Actor {
 				if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
 						+ width + xSpeed+range, y - ySpeed), enemies.get(spot)
 						.getBody())) {
-					Log.d(TAG, "AHA");
+					//Log.d(TAG, "AHA");
 					setAllyAttacking();
 					attacked = true;
 				}
@@ -117,13 +117,13 @@ public class Ally extends Actor {
 
 	// Made actor so usable by both classes. Check for errors but should be alright
 	public void attackEnemy(ArrayList<Enemy> enemies) {
-		Log.d(TAG, "Attacking!");
+		//Log.d(TAG, "Attacking!");
 		boolean attacked = false;
 		int spot = 0;
 		while (spot < enemies.size() && !attacked) {
 			if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
 					+ width + xSpeed + range, y - ySpeed), enemies.get(spot).getBody())) {
-				Log.d(TAG, "AHA");
+				//Log.d(TAG, "AHA");
 				if(!ranged){
 				if (enemies.get(spot).takeDamage(damage)) {
 					enemies.remove(spot);
@@ -145,7 +145,7 @@ public class Ally extends Actor {
 		}
 		if (!attacked && allyState == AllyState.attackingEnemy) {
 			setAllyMoving();
-			Log.d(TAG, "Done Attacking!");
+			//Log.d(TAG, "Done Attacking!");
 		}
 	}
 

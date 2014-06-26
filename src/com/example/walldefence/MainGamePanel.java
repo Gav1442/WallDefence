@@ -25,8 +25,10 @@ public class MainGamePanel extends SurfaceView implements
 	private int screenHeight, screenWidth, xBegin, yBegin;
 	private float scaleWidth, scaleHeight;
 	private Bitmap background;
-	private boolean loaded = false, button_touch = false, blnMainMenu = true, blnUpgradeMenu = false, blnInGame = false;
+	private boolean loaded = false, button_touch = false, blnMainMenu = true,
+			blnUpgradeMenu = false, blnInGame = false;
 	private Context myContext;
+	private long waveStartTime, lastEnemyTime;
 
 	public MainGamePanel(Context context) {
 		super(context);
@@ -52,11 +54,13 @@ public class MainGamePanel extends SurfaceView implements
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
 				// set beginning touch point
 				xBegin = (int) event.getX();
-				yBegin = (int) event.getX();
-				for (int i = 0; i < buttons.size(); i++) {
-					if (buttons.get(i).touchDownIntersects(event)) {
-						buttons.get(i).setTouch_down(true);
-						button_touch = true;
+				yBegin = (int) event.getX();	
+				if(blnInGame){
+					for (int i = 0; i < buttons.size(); i++) {
+						if (buttons.get(i).touchDownIntersects(event)) {
+							buttons.get(i).setTouch_down(true);
+							button_touch = true;
+						}
 					}
 				}
 				// check for intersect (testing for now)
@@ -90,7 +94,11 @@ public class MainGamePanel extends SurfaceView implements
 				xBegin = 0;
 				yBegin = 0;
 				// check for intersect (testing for now)
-				if (button_touch) {
+				if(blnMainMenu){
+					setUpWave();
+				}
+				else if(blnInGame){ 
+					if (button_touch) {
 					for (int i = 0; i < buttons.size(); i++) {
 						if (buttons.get(i).touchUpIntersects(event)) {
 							buttons.get(i).setTouch_down(false);
@@ -110,6 +118,7 @@ public class MainGamePanel extends SurfaceView implements
 					button_touch = false;
 				}
 			}
+			}
 		}
 		return true;
 
@@ -120,103 +129,173 @@ public class MainGamePanel extends SurfaceView implements
 		// GET SPRITESHEET FROM ANDREW AND WORK AROUND THAT
 		switch (buttonID) {
 		case 1:
-			allies.add(new AllySoldier(BitmapFactory.decodeResource(getResources(),
-					R.drawable.test_sprite), 10, 2 * screenHeight / 3,
-					scaleWidth, scaleHeight, thread.getMaxFps(), onTopOfWall));
+			allies.add(new AllySoldier(BitmapFactory.decodeResource(
+					getResources(), R.drawable.test_sprite), 10,
+					2 * screenHeight / 3, scaleWidth, scaleHeight, MainThread
+							.getMaxFps(), onTopOfWall));
 			break;
 		case 2:
-			allies.add(new AllyArcher(BitmapFactory.decodeResource(getResources(),
-					R.drawable.test_archer_sprite), 10, 2 * screenHeight / 3,
-					scaleWidth, scaleHeight, thread.getMaxFps(), onTopOfWall));
+			allies.add(new AllyArcher(BitmapFactory.decodeResource(
+					getResources(), R.drawable.test_archer_sprite), 10,
+					2 * screenHeight / 3, scaleWidth, scaleHeight, MainThread
+							.getMaxFps(), onTopOfWall));
 			break;
 		default:
-			Log.d(TAG, "Error creating enemy - No case for buttonID: " + buttonID);
+			Log.d(TAG, "Error creating enemy - No case for buttonID: "
+					+ buttonID);
 		}
 	}
 
 	public void update() {
-		for (int spot = 0; spot < allies.size(); spot++) {
-			allies.get(spot).update(enemies, wall, System.currentTimeMillis());
+		long currentSystemTime = System.currentTimeMillis();
+		if(blnInGame){
+			if(currentSystemTime - waveStartTime >= 20000){
+				endWave();
+			}
+			else{
+				for (int spot = 0; spot < allies.size(); spot++) {
+					allies.get(spot).update(enemies, wall, currentSystemTime);
+				}
+				for (int spot = 0; spot < enemies.size(); spot++) {
+					enemies.get(spot).update(allies, wall);
+				}
+		// 		should we sort enemy to make highest HP first so you are attacking
+		// 		highest priority target as opposed to what ever happens to be first
+		// 		in the list?
+				if(currentSystemTime - lastEnemyTime >= 5000){
+					enemies.add(new Enemy(BitmapFactory.decodeResource(
+							myContext.getResources(), R.drawable.temp_soldier),
+							screenWidth - 10, 2 * screenHeight / 3, scaleWidth,
+							scaleHeight, thread.getMaxFps()));
+					lastEnemyTime = currentSystemTime;
+				}
+			}
 		}
-		for (int spot = 0; spot < enemies.size(); spot++) {
-			enemies.get(spot).update(allies, wall);
-		}
-		// should we sort enemy to make highest HP first so you are attacking
-		// highest priority target as opposed to what ever happens to be first
-		// in the list?
 	}
 
 	public void render(Canvas canvas) {
-		//create a render for main menu and upgrade menu
+		// create a render for main menu and upgrade menu
 		if (loaded == true) {
 			canvas.drawColor(Color.BLACK);
 			canvas.drawBitmap(background, 0, 0, null);
-			wall.drawBitmap(canvas);
-			for (int spot = 0; spot < allies.size(); spot++) {
-				allies.get(spot).drawBitmap(canvas);
-			}
-			for (int spot = 0; spot < enemies.size(); spot++) {
-				enemies.get(spot).drawBitmap(canvas);
-			}
-			for (int spot = 0; spot < buttons.size(); spot++) {
-				buttons.get(spot).drawBitmap(canvas);
-			}
-			Paint p = new Paint();
-			p.setColor(Color.BLACK);
-			canvas.drawLine(0, 2 * screenHeight / 3, screenWidth,
+			if(blnInGame){ //draw InGame entities
+				wall.drawBitmap(canvas);
+				for (int spot = 0; spot < allies.size(); spot++) {
+					allies.get(spot).drawBitmap(canvas);
+				}
+				for (int spot = 0; spot < enemies.size(); spot++) {
+					enemies.get(spot).drawBitmap(canvas);
+				}
+				for (int spot = 0; spot < buttons.size(); spot++) {
+					buttons.get(spot).drawBitmap(canvas);
+				}
+				Paint p = new Paint();
+				p.setColor(Color.BLACK);
+				canvas.drawLine(0, 2 * screenHeight / 3, screenWidth,
 					2 * screenHeight / 3, p);
-		}
-		else{
-			background = BitmapFactory.decodeResource(myContext.getResources(),
-					R.drawable.game);
-			Log.d(TAG, "Unscaled - Background Width: " + background.getWidth()
-					+ ", Background Height: " + background.getHeight() + ".");
-			Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
-					+ screenHeight + ".");
-			// scale reference for height of everything
-			scaleHeight = (float) screenHeight / (float) background.getHeight();
-			// scale reference for width of everything
-			scaleWidth = (float) screenWidth / (float) background.getWidth();
-			// --- scale the background ---
-			background = Bitmap.createScaledBitmap(background, screenWidth,
-					screenHeight, true);
-			Log.d(TAG, "Scaled - Background Width: " + background.getWidth()
-					+ ", Background Height: " + background.getHeight() + ".");
-			Log.d(TAG, "Scale Width: " + scaleWidth + ", Scale Height: "
-					+ scaleHeight + ".");
-			/*
-			// initialize buttons
-			buttons.add(new Button(myContext, 1, screenWidth / 6,
-					7 * screenHeight / 8, scaleWidth, scaleHeight));
-			buttons.add(new Button(myContext, 2, screenWidth / 6,
-					7 * screenHeight / 8, scaleWidth, scaleHeight));
+			}
+		} else {
+			if (blnMainMenu) {
+				background = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.main_menu_bg);
+				Log.d(TAG, "Unscaled - Background Width: " + background.getWidth() + ", Background Height: " + background.getHeight() + ".");
+				Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: " + screenHeight + ".");
+				// scale reference for height of everything
+				scaleHeight = (float) screenHeight / (float) background.getHeight();
+				// scale reference for width of everything
+				scaleWidth = (float) screenWidth / (float) background.getWidth();
+				// --- scale the background ---
+				background = Bitmap.createScaledBitmap(background, screenWidth, screenHeight, true);
+				Log.d(TAG, "Scaled - Background Width: " + background.getWidth() + ", Background Height: " + background.getHeight() + ".");
+				Log.d(TAG, "Scale Width: " + scaleWidth + ", Scale Height: "+ scaleHeight + ".");
+				loaded = true;
+			}
+			// Is this if ever called? What about loading back into the game?
+			else if (blnInGame) {
+				background = BitmapFactory.decodeResource(
+						myContext.getResources(), R.drawable.game);
+				Log.d(TAG,
+						"Unscaled - Background Width: " + background.getWidth()
+								+ ", Background Height: "
+								+ background.getHeight() + ".");
+				Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
+						+ screenHeight + ".");
+				// scale reference for height of everything
+				scaleHeight = (float) screenHeight
+						/ (float) background.getHeight();
+				// scale reference for width of everything
+				scaleWidth = (float) screenWidth
+						/ (float) background.getWidth();
+				// --- scale the background ---
+				background = Bitmap.createScaledBitmap(background, screenWidth,
+						screenHeight, true);
+				Log.d(TAG,
+						"Scaled - Background Width: " + background.getWidth()
+								+ ", Background Height: "
+								+ background.getHeight() + ".");
+				Log.d(TAG, "Scale Width: " + scaleWidth + ", Scale Height: "
+						+ scaleHeight + ".");
 
-			// --- initialize and scale wall 1
-			wall = new Wall(getContext(), 1, screenWidth / 2, 2 * screenHeight / 3,
-					scaleWidth, scaleHeight);
-			Log.d(TAG, "Unscaled - Wall Width: " + wall.getWidth()
-					+ ", Wall Height: " + wall.getHeight() + ".");
+				// initialize buttons
+				buttons.add(new Button(myContext, 1, screenWidth / 6,
+						7 * screenHeight / 8, scaleWidth, scaleHeight));
+				buttons.add(new Button(myContext, 2, screenWidth / 6,
+						7 * screenHeight / 8, scaleWidth, scaleHeight));
 
-			// -- initialize and scale test ally
-			Bitmap testBitmap = BitmapFactory.decodeResource(
-					myContext.getResources(), R.drawable.temp_soldier);
-			enemies.add(new Enemy(BitmapFactory.decodeResource(
-					myContext.getResources(), R.drawable.temp_soldier),
-					screenWidth - 10, 2 * screenHeight / 3, scaleWidth,
-					scaleHeight, thread.getMaxFps()));
-			// call function to resize existing and set scales...
-			// or maybe don't initialize walls until now instead of onCreate and
-			// pass scale values to them
-			// set a boolean in the initial resize to true so that the draw function
-			// only gets called after that
-			// this may fix the issue of crashing...
-			 *
-			 */
-			Log.d(TAG, "Loaded is: " + loaded);
-			loaded = true;
+				// --- initialize and scale wall 1
+				wall = new Wall(getContext(), 1, screenWidth / 2,
+						2 * screenHeight / 3, scaleWidth, scaleHeight);
+				Log.d(TAG, "Unscaled - Wall Width: " + wall.getWidth()
+						+ ", Wall Height: " + wall.getHeight() + ".");
+
+				enemies.add(new Enemy(BitmapFactory.decodeResource(
+						myContext.getResources(), R.drawable.temp_soldier),
+						screenWidth - 10, 2 * screenHeight / 3, scaleWidth,
+						scaleHeight, thread.getMaxFps()));
+
+				Log.d(TAG, "Loaded is: " + loaded);
+				loaded = true;
+			}
 		}
 	}
-
+	
+	//after New Wave is pushed, this function will initialize all of the necessary game entities.
+	public void setUpWave(){
+		background = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.game);
+		// --- scale the background ---
+		background = Bitmap.createScaledBitmap(background, screenWidth,
+				screenHeight, true);
+		// initialize buttons
+		buttons.add(new Button(myContext, 1, screenWidth / 6,
+				7 * screenHeight / 8, scaleWidth, scaleHeight));
+		buttons.add(new Button(myContext, 2, screenWidth / 6,
+				7 * screenHeight / 8, scaleWidth, scaleHeight));
+		// --- initialize and scale wall 1
+		wall = new Wall(getContext(), 1, screenWidth / 2,
+				2 * screenHeight / 3, scaleWidth, scaleHeight);
+		enemies.add(new Enemy(BitmapFactory.decodeResource(
+				myContext.getResources(), R.drawable.temp_soldier),
+				screenWidth - 10, 2 * screenHeight / 3, scaleWidth,
+				scaleHeight, thread.getMaxFps()));
+		lastEnemyTime = System.currentTimeMillis(); 
+		blnMainMenu = false;
+		blnInGame = true;
+		waveStartTime = System.currentTimeMillis();
+	}
+	
+	public void endWave(){
+		blnMainMenu = true;
+		blnInGame = false;
+		// --- scale the background ---
+		background = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(myContext.getResources(), R.drawable.main_menu_bg), screenWidth,
+				screenHeight, true);
+		// initialize buttons
+		buttons.clear();
+		// --- initialize and scale wall 1
+		wall = null;
+		enemies.clear();
+		allies.clear();
+	}
+	
 	private void displayFps(Canvas canvas, String fps) {
 		if (canvas != null && fps != null) {
 			Paint paint = new Paint();
@@ -230,47 +309,41 @@ public class MainGamePanel extends SurfaceView implements
 			int height) {
 		screenHeight = height;
 		screenWidth = width;
-		/*Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
-				+ screenHeight + ".");
-		// scale reference for height of everything
-		scaleHeight = (float) screenHeight / (float) background.getHeight();
-		// scale reference for width of everything
-		scaleWidth = (float) screenWidth / (float) background.getWidth();
-		// --- scale the background ---
-		background = Bitmap.createScaledBitmap(background, screenWidth,
-				screenHeight, true);
-		Log.d(TAG, "Scaled - Background Width: " + background.getWidth()
-				+ ", Background Height: " + background.getHeight() + ".");
-		Log.d(TAG, "Scale Width: " + scaleWidth + ", Scale Height: "
-				+ scaleHeight + ".");
-
-		// initialize buttons
-		buttons.add(new Button(myContext, 1, screenWidth / 6,
-				7 * screenHeight / 8, scaleWidth, scaleHeight));
-		buttons.add(new Button(myContext, 2, screenWidth / 6,
-				7 * screenHeight / 8, scaleWidth, scaleHeight));
-
-		// --- initialize and scale wall 1
-		wall = new Wall(getContext(), 1, screenWidth / 2, 2 * screenHeight / 3,
-				scaleWidth, scaleHeight);
-		Log.d(TAG, "Unscaled - Wall Width: " + wall.getWidth()
-				+ ", Wall Height: " + wall.getHeight() + ".");
-
-		// -- initialize and scale test ally
-		Bitmap testBitmap = BitmapFactory.decodeResource(
-				myContext.getResources(), R.drawable.temp_soldier);
-		enemies.add(new Enemy(BitmapFactory.decodeResource(
-				myContext.getResources(), R.drawable.temp_soldier),
-				screenWidth - 10, 2 * screenHeight / 3, scaleWidth,
-				scaleHeight, thread.getMaxFps()));
-		// call function to resize existing and set scales...
-		// or maybe don't initialize walls until now instead of onCreate and
-		// pass scale values to them
-		// set a boolean in the initial resize to true so that the draw function
-		// only gets called after that
-		// this may fix the issue of crashing...
-		loaded = true;
-		*/
+		/*
+		 * Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: " +
+		 * screenHeight + "."); // scale reference for height of everything
+		 * scaleHeight = (float) screenHeight / (float) background.getHeight();
+		 * // scale reference for width of everything scaleWidth = (float)
+		 * screenWidth / (float) background.getWidth(); // --- scale the
+		 * background --- background = Bitmap.createScaledBitmap(background,
+		 * screenWidth, screenHeight, true); Log.d(TAG,
+		 * "Scaled - Background Width: " + background.getWidth() +
+		 * ", Background Height: " + background.getHeight() + "."); Log.d(TAG,
+		 * "Scale Width: " + scaleWidth + ", Scale Height: " + scaleHeight +
+		 * ".");
+		 * 
+		 * // initialize buttons buttons.add(new Button(myContext, 1,
+		 * screenWidth / 6, 7 * screenHeight / 8, scaleWidth, scaleHeight));
+		 * buttons.add(new Button(myContext, 2, screenWidth / 6, 7 *
+		 * screenHeight / 8, scaleWidth, scaleHeight));
+		 * 
+		 * // --- initialize and scale wall 1 wall = new Wall(getContext(), 1,
+		 * screenWidth / 2, 2 * screenHeight / 3, scaleWidth, scaleHeight);
+		 * Log.d(TAG, "Unscaled - Wall Width: " + wall.getWidth() +
+		 * ", Wall Height: " + wall.getHeight() + ".");
+		 * 
+		 * // -- initialize and scale test ally Bitmap testBitmap =
+		 * BitmapFactory.decodeResource( myContext.getResources(),
+		 * R.drawable.temp_soldier); enemies.add(new
+		 * Enemy(BitmapFactory.decodeResource( myContext.getResources(),
+		 * R.drawable.temp_soldier), screenWidth - 10, 2 * screenHeight / 3,
+		 * scaleWidth, scaleHeight, thread.getMaxFps())); // call function to
+		 * resize existing and set scales... // or maybe don't initialize walls
+		 * until now instead of onCreate and // pass scale values to them // set
+		 * a boolean in the initial resize to true so that the draw function //
+		 * only gets called after that // this may fix the issue of crashing...
+		 * loaded = true;
+		 */
 	}
 
 	@Override

@@ -14,4 +14,8 @@ public class Projectile {
 		this.ySpeed = ySpeed;
 		this.damage = damage;
 	}
+	
+	public void checkCollision(){
+		
+	}
 }
