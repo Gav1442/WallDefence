@@ -1,15 +1,12 @@
 package com.example.walldefence;
 
 import java.util.ArrayList;
-
-import com.example.walldefence.Ally.AllyState;
-
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.Log;
 
 public class Enemy extends Actor {
-	public enum EnemyState {
+	private enum EnemyState {
 		moving, atWall, attackingAlly
 	};
 
@@ -18,7 +15,7 @@ public class Enemy extends Actor {
 	public Enemy(Bitmap bitmap, int x, int y, float scaleWidth,
 			float scaleHeight, int fps) {
 		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 1, 1);
-		this.xSpeed = -2;
+		this.xSpeed = -6;
 		this.ySpeed = 0;
 		this.enemyState = EnemyState.moving;
 		this.health = 150;

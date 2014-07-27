@@ -10,6 +10,7 @@ public class AllyArcher extends Ally{
 		super(bitmap, x, y, scaleWidth, scaleHeight, fps, onTopOfWall);
 		// TODO Auto-generated constructor stub
 		this.ranged = true;
+		this.xSpeed = 8;
 		this.range = arrowRange; 
 	}
 

@@ -8,7 +8,7 @@ import android.util.Log;
 
 //Base for all units.
 public class Ally extends Actor {
-	public enum AllyState {
+	private enum AllyState {
 		moving, atWall, attackingEnemy;
 	};
 
@@ -19,16 +19,14 @@ public class Ally extends Actor {
 	public Ally(Bitmap bitmap, int x, int y, float scaleWidth,
 			float scaleHeight, int fps, boolean onTopOfWall) {
 		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 5, 3);
-		this.xSpeed = 3;
+		this.xSpeed = 6;
 		this.ySpeed = 0;
 		this.onTopOfWall = onTopOfWall;
 		this.health = 10000;
 		this.damage = 10;
 		this.allyState = AllyState.moving;
 		this.body = new Rect(x, y - height, x + width, y);
-		this.srcRect = new Rect(0, 0, this.width, this.height); // Rect for
-																// selecting the
-																// frame
+		this.srcRect = new Rect(0, 0, this.width, this.height); // Rect for selecting the frame
 	}
 
 	public void update(ArrayList<Enemy> enemies, Wall wall, long gameTime) {

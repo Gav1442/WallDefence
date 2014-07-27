@@ -17,16 +17,18 @@ import android.view.SurfaceView;
 public class MainGamePanel extends SurfaceView implements
 		SurfaceHolder.Callback {
 	private MainThread thread;
+	private final int NUMBER_OF_MAIN_MENU_BUTTONS = 4;
 	private final String TAG = "MainGamePanel";
 	private ArrayList<Ally> allies = new ArrayList<Ally>();
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-	private ArrayList<Button> buttons = new ArrayList<Button>();
+	private ArrayList<GameButton> gameButtons = new ArrayList<GameButton>();
+	private ArrayList<MainMenuButton> mainMenuButtons = new ArrayList<MainMenuButton>();
 	private Wall wall;
 	private int screenHeight, screenWidth, xBegin, yBegin;
 	private float scaleWidth, scaleHeight;
 	private Bitmap background;
 	private boolean loaded = false, button_touch = false, blnMainMenu = true,
-			blnUpgradeMenu = false, blnInGame = false;
+			blnUpgradeMenu = false, blnInGame = false; //button_touch is to differentiate button from shifting screen.
 	private Context myContext;
 	private long waveStartTime, lastEnemyTime;
 
@@ -54,11 +56,16 @@ public class MainGamePanel extends SurfaceView implements
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
 				// set beginning touch point
 				xBegin = (int) event.getX();
-				yBegin = (int) event.getX();	
-				if(blnInGame){
-					for (int i = 0; i < buttons.size(); i++) {
-						if (buttons.get(i).touchDownIntersects(event)) {
-							buttons.get(i).setTouch_down(true);
+				yBegin = (int) event.getX();
+				if (blnMainMenu) {
+					for (int i = 0; i < mainMenuButtons.size(); i++) {
+						if (mainMenuButtons.get(i).touchDownIntersects(event)) {
+							button_touch = true;
+						}
+					}
+				} else if (blnInGame) {
+					for (int i = 0; i < gameButtons.size(); i++) {
+						if (gameButtons.get(i).touchDownIntersects(event)) {
 							button_touch = true;
 						}
 					}
@@ -66,7 +73,6 @@ public class MainGamePanel extends SurfaceView implements
 				// check for intersect (testing for now)
 			}
 			// ACTION_MOVE matters when moving the whole screen/view
-			// Figure out why button not reselected if touch MOVES back onto it
 			// ******
 			if (event.getAction() == MotionEvent.ACTION_MOVE) {
 				int xCurrent = (int) event.getX();
@@ -80,11 +86,13 @@ public class MainGamePanel extends SurfaceView implements
 				 * wall.getX() + " and y:" + wall.getY() + "!");
 				 */
 				if (button_touch) {
-					for (int i = 0; i < buttons.size(); i++) {
-						if (buttons.get(i).touchMoveIntersects(event)) {
-							buttons.get(i).setTouch_down(true);
-						} else {
-							buttons.get(i).setTouch_down(false);
+					if (blnMainMenu) {
+						for (int i = 0; i < mainMenuButtons.size(); i++) {
+							mainMenuButtons.get(i).touchMoveIntersects(event);
+						}
+					} else if (blnInGame) {
+						for (int i = 0; i < gameButtons.size(); i++) {
+							gameButtons.get(i).touchMoveIntersects(event);
 						}
 					}
 				}
@@ -94,75 +102,57 @@ public class MainGamePanel extends SurfaceView implements
 				xBegin = 0;
 				yBegin = 0;
 				// check for intersect (testing for now)
-				if(blnMainMenu){
-					setUpWave();
-				}
-				else if(blnInGame){ 
-					if (button_touch) {
-					for (int i = 0; i < buttons.size(); i++) {
-						if (buttons.get(i).touchUpIntersects(event)) {
-							buttons.get(i).setTouch_down(false);
-							if (buttons
-									.get(i)
-									.getBody()
-									.contains((int) event.getX(),
-											(int) event.getY())) {
-								createAlly(buttons.get(i).getButtonNumber(),
-										false);
-							} else {
-								createAlly(buttons.get(i).getButtonNumber(),
-										true);
+				if (button_touch) {
+					if (blnMainMenu) {
+						for (int i = 0; i < mainMenuButtons.size(); i++) {
+							if (mainMenuButtons.get(i).touchUpIntersects(event)) {
+								setUpWave();
+							}
+						}
+					} else if (blnInGame) {
+						for (int i = 0; i < gameButtons.size(); i++) {
+							if (gameButtons.get(i).touchUpIntersects(event)) {
+								gameButtons.get(i).setTouch_down(false);
+								if (gameButtons.get(i)
+										.getBody()
+										.contains((int) event.getX(),
+												(int) event.getY())) {
+									gameButtons.get(i).createAlly(myContext, allies, screenHeight, screenWidth, scaleHeight, scaleWidth, false);
+								} else {
+									gameButtons.get(i).createAlly(myContext, allies, screenHeight, screenWidth, scaleHeight, scaleWidth, true);
+								}
 							}
 						}
 					}
 					button_touch = false;
 				}
 			}
-			}
 		}
 		return true;
-
 	}
 
 	public void createAlly(int buttonID, boolean onTopOfWall) {
-		// Will have to turn into a switch statement later depending on buttonID
-		// GET SPRITESHEET FROM ANDREW AND WORK AROUND THAT
-		switch (buttonID) {
-		case 1:
-			allies.add(new AllySoldier(BitmapFactory.decodeResource(
-					getResources(), R.drawable.test_sprite), 10,
-					2 * screenHeight / 3, scaleWidth, scaleHeight, MainThread
-							.getMaxFps(), onTopOfWall));
-			break;
-		case 2:
-			allies.add(new AllyArcher(BitmapFactory.decodeResource(
-					getResources(), R.drawable.test_archer_sprite), 10,
-					2 * screenHeight / 3, scaleWidth, scaleHeight, MainThread
-							.getMaxFps(), onTopOfWall));
-			break;
-		default:
-			Log.d(TAG, "Error creating enemy - No case for buttonID: "
-					+ buttonID);
-		}
+		
 	}
 
 	public void update() {
 		long currentSystemTime = System.currentTimeMillis();
-		if(blnInGame){
-			if(currentSystemTime - waveStartTime >= 20000){
+		if (blnInGame) {
+			if (currentSystemTime - waveStartTime >= 120000) {
 				endWave();
-			}
-			else{
+			} else {
 				for (int spot = 0; spot < allies.size(); spot++) {
 					allies.get(spot).update(enemies, wall, currentSystemTime);
 				}
 				for (int spot = 0; spot < enemies.size(); spot++) {
 					enemies.get(spot).update(allies, wall);
 				}
-		// 		should we sort enemy to make highest HP first so you are attacking
-		// 		highest priority target as opposed to what ever happens to be first
-		// 		in the list?
-				if(currentSystemTime - lastEnemyTime >= 5000){
+				// should we sort enemy to make highest HP first so you are
+				// attacking
+				// highest priority target as opposed to what ever happens to be
+				// first
+				// in the list?
+				if (currentSystemTime - lastEnemyTime >= 7000) {
 					enemies.add(new Enemy(BitmapFactory.decodeResource(
 							myContext.getResources(), R.drawable.temp_soldier),
 							screenWidth - 10, 2 * screenHeight / 3, scaleWidth,
@@ -178,7 +168,11 @@ public class MainGamePanel extends SurfaceView implements
 		if (loaded == true) {
 			canvas.drawColor(Color.BLACK);
 			canvas.drawBitmap(background, 0, 0, null);
-			if(blnInGame){ //draw InGame entities
+			if (blnMainMenu) {
+				for (int spot = 0; spot < mainMenuButtons.size(); spot++) {
+					mainMenuButtons.get(spot).drawBitmap(canvas);
+				}
+			} else if (blnInGame) { // draw InGame entities
 				wall.drawBitmap(canvas);
 				for (int spot = 0; spot < allies.size(); spot++) {
 					allies.get(spot).drawBitmap(canvas);
@@ -186,27 +180,44 @@ public class MainGamePanel extends SurfaceView implements
 				for (int spot = 0; spot < enemies.size(); spot++) {
 					enemies.get(spot).drawBitmap(canvas);
 				}
-				for (int spot = 0; spot < buttons.size(); spot++) {
-					buttons.get(spot).drawBitmap(canvas);
+				for (int spot = 0; spot < gameButtons.size(); spot++) {
+					gameButtons.get(spot).drawBitmap(canvas);
 				}
 				Paint p = new Paint();
 				p.setColor(Color.BLACK);
 				canvas.drawLine(0, 2 * screenHeight / 3, screenWidth,
-					2 * screenHeight / 3, p);
+						2 * screenHeight / 3, p);
 			}
 		} else {
 			if (blnMainMenu) {
-				background = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.main_menu_bg);
-				Log.d(TAG, "Unscaled - Background Width: " + background.getWidth() + ", Background Height: " + background.getHeight() + ".");
-				Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: " + screenHeight + ".");
+				background = BitmapFactory.decodeResource(
+						myContext.getResources(), R.drawable.main_menu_bg);
+				Log.d(TAG,
+						"Unscaled - Background Width: " + background.getWidth()
+								+ ", Background Height: "
+								+ background.getHeight() + ".");
+				Log.d(TAG, "Screen Width: " + screenWidth + ", Screen Height: "
+						+ screenHeight + ".");
 				// scale reference for height of everything
-				scaleHeight = (float) screenHeight / (float) background.getHeight();
+				scaleHeight = (float) screenHeight
+						/ (float) background.getHeight();
 				// scale reference for width of everything
-				scaleWidth = (float) screenWidth / (float) background.getWidth();
+				scaleWidth = (float) screenWidth
+						/ (float) background.getWidth();
 				// --- scale the background ---
-				background = Bitmap.createScaledBitmap(background, screenWidth, screenHeight, true);
-				Log.d(TAG, "Scaled - Background Width: " + background.getWidth() + ", Background Height: " + background.getHeight() + ".");
-				Log.d(TAG, "Scale Width: " + scaleWidth + ", Scale Height: "+ scaleHeight + ".");
+				background = Bitmap.createScaledBitmap(background, screenWidth,
+						screenHeight, true);
+				Log.d(TAG,
+						"Scaled - Background Width: " + background.getWidth()
+								+ ", Background Height: "
+								+ background.getHeight() + ".");
+				Log.d(TAG, "Scale Width: " + scaleWidth + ", Scale Height: "
+						+ scaleHeight + ".");
+				for (int i = 1; i <= NUMBER_OF_MAIN_MENU_BUTTONS; i++) {
+					mainMenuButtons
+							.add(new MainMenuButton(myContext, i, screenWidth,
+									screenHeight, scaleWidth, scaleHeight));
+				}
 				loaded = true;
 			}
 			// Is this if ever called? What about loading back into the game?
@@ -236,9 +247,9 @@ public class MainGamePanel extends SurfaceView implements
 						+ scaleHeight + ".");
 
 				// initialize buttons
-				buttons.add(new Button(myContext, 1, screenWidth / 6,
+				gameButtons.add(new GameButton(myContext, 1, screenWidth / 6,
 						7 * screenHeight / 8, scaleWidth, scaleHeight));
-				buttons.add(new Button(myContext, 2, screenWidth / 6,
+				gameButtons.add(new GameButton(myContext, 2, screenWidth / 6,
 						7 * screenHeight / 8, scaleWidth, scaleHeight));
 
 				// --- initialize and scale wall 1
@@ -257,45 +268,48 @@ public class MainGamePanel extends SurfaceView implements
 			}
 		}
 	}
-	
-	//after New Wave is pushed, this function will initialize all of the necessary game entities.
-	public void setUpWave(){
-		background = BitmapFactory.decodeResource(myContext.getResources(), R.drawable.game);
+
+	// after New Wave is pushed, this function will initialize all of the
+	// necessary game entities.
+	public void setUpWave() {
+		background = BitmapFactory.decodeResource(myContext.getResources(),
+				R.drawable.game);
 		// --- scale the background ---
 		background = Bitmap.createScaledBitmap(background, screenWidth,
 				screenHeight, true);
 		// initialize buttons
-		buttons.add(new Button(myContext, 1, screenWidth / 6,
+		gameButtons.add(new GameButton(myContext, 1, screenWidth / 6,
 				7 * screenHeight / 8, scaleWidth, scaleHeight));
-		buttons.add(new Button(myContext, 2, screenWidth / 6,
+		gameButtons.add(new GameButton(myContext, 2, screenWidth / 6,
 				7 * screenHeight / 8, scaleWidth, scaleHeight));
 		// --- initialize and scale wall 1
-		wall = new Wall(getContext(), 1, screenWidth / 2,
-				2 * screenHeight / 3, scaleWidth, scaleHeight);
+		wall = new Wall(getContext(), 1, screenWidth / 2, 2 * screenHeight / 3,
+				scaleWidth, scaleHeight);
 		enemies.add(new Enemy(BitmapFactory.decodeResource(
 				myContext.getResources(), R.drawable.temp_soldier),
 				screenWidth - 10, 2 * screenHeight / 3, scaleWidth,
 				scaleHeight, thread.getMaxFps()));
-		lastEnemyTime = System.currentTimeMillis(); 
+		lastEnemyTime = System.currentTimeMillis();
 		blnMainMenu = false;
 		blnInGame = true;
 		waveStartTime = System.currentTimeMillis();
 	}
-	
-	public void endWave(){
+
+	public void endWave() {
 		blnMainMenu = true;
 		blnInGame = false;
 		// --- scale the background ---
-		background = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(myContext.getResources(), R.drawable.main_menu_bg), screenWidth,
-				screenHeight, true);
+		background = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(
+				myContext.getResources(), R.drawable.main_menu_bg),
+				screenWidth, screenHeight, true);
 		// initialize buttons
-		buttons.clear();
+		gameButtons.clear();
 		// --- initialize and scale wall 1
 		wall = null;
 		enemies.clear();
 		allies.clear();
 	}
-	
+
 	private void displayFps(Canvas canvas, String fps) {
 		if (canvas != null && fps != null) {
 			Paint paint = new Paint();
