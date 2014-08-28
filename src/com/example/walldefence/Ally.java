@@ -2,12 +2,14 @@ package com.example.walldefence;
 
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.util.Log;
 
 //Base for all units.
-public class Ally extends Actor {
+public abstract class Ally extends Actor {
 	private enum AllyState {
 		moving, atWall, attackingEnemy;
 	};
@@ -16,9 +18,8 @@ public class Ally extends Actor {
 	protected final String TAG = "Ally";
 	protected boolean onTopOfWall;
 
-	public Ally(Bitmap bitmap, int x, int y, float scaleWidth,
-			float scaleHeight, int fps, boolean onTopOfWall) {
-		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 5, 3);
+	public Ally(Bitmap bitmap, int x, int y, int fps, boolean onTopOfWall) {
+		super(bitmap, x, y, fps, 5, 3);
 		this.xSpeed = 6;
 		this.ySpeed = 0;
 		this.onTopOfWall = onTopOfWall;
@@ -29,7 +30,7 @@ public class Ally extends Actor {
 		this.srcRect = new Rect(0, 0, this.width, this.height); // Rect for selecting the frame
 	}
 
-	public void update(ArrayList<Enemy> enemies, Wall wall, long gameTime) {
+	public void update(ArrayList<Enemy> enemies, Wall wall, long gameTime, ArrayList<Projectile> projectiles) {
 		checkEnemyCollision(enemies); // check enemies first so if unit is done
 										// attacking they will next check if
 										// they are at wall
@@ -44,7 +45,7 @@ public class Ally extends Actor {
 			currentFrame++;
 			if (currentFrame >= numberOfFramesWidth) {
 				if(allyState == AllyState.attackingEnemy){
-					attackEnemy(enemies);
+					attackEnemy(enemies, projectiles);
 				}
 				currentFrame = 0;
 			}
@@ -58,18 +59,9 @@ public class Ally extends Actor {
 	}
 
 	public void checkWallCollision(Wall wall) {
-		// check to see if actor is colliding with wall.
-		// Log.d(TAG,"Front of character: " + (x+xSpeed+width) +
-		// ", edge of wall: " + wall.getX());
 		if (allyState == AllyState.moving) {
 			if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
 					+ width + xSpeed, y - ySpeed), wall.getStructure())) {
-				// Log.d(TAG,"Character x: " + x);
-				// Log.d(TAG,"Front of character: " + (x+xSpeed+width) +
-				// ", edge of wall: " + wall.getX());
-				// x += (x+width+xSpeed) - wall.getX();
-				// Log.d(TAG,"L:" + x + ", T:" + (y-height) + ", R:" + (x+width)
-				// + ", B:" + y);
 				setAllyAtWall();
 			}
 		}
@@ -114,7 +106,7 @@ public class Ally extends Actor {
 	}
 
 	// Made actor so usable by both classes. Check for errors but should be alright
-	public void attackEnemy(ArrayList<Enemy> enemies) {
+	public void attackEnemy(ArrayList<Enemy> enemies, ArrayList<Projectile> projectiles) {
 		//Log.d(TAG, "Attacking!");
 		boolean attacked = false;
 		int spot = 0;
@@ -123,17 +115,19 @@ public class Ally extends Actor {
 					+ width + xSpeed + range, y - ySpeed), enemies.get(spot).getBody())) {
 				//Log.d(TAG, "AHA");
 				if(!ranged){
-				if (enemies.get(spot).takeDamage(damage)) {
-					enemies.remove(spot);
-					setAllyMoving();
-				}
-				}
-				else{
-					//Change to adding a projectile to projectile ArrayList
 					if (enemies.get(spot).takeDamage(damage)) {
 						enemies.remove(spot);
 						setAllyMoving();
-					}	
+					}
+				}
+				else{
+						Bitmap arrow_bitmap = BitmapFactory.decodeResource(
+								myContext.getResources(), R.drawable.test_arrow);
+						projectiles.add(new Projectile(Bitmap.createScaledBitmap(arrow_bitmap,
+								(int) (bitmap.getWidth() * scaleWidth),
+								(int) (bitmap.getHeight() * scaleHeight), true),
+								this.x+this.width, this.y-3*(this.y)/4, 5, 0, damage));
+						setAllyMoving();	
 				}
 				// allyState = AllyState.attackingEnemy; <-- This line would
 				// pose a problem, already attacking. Otherwise killed enemy.

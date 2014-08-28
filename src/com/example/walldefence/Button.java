@@ -19,7 +19,7 @@ public class Button {
 	
 	//My thoughts here are to base the loaded images from 
 	
-	public Button(Context myContext, int buttonNumber, int x, int y, float scaleWidth, float scaleHeight){
+	public Button(int buttonNumber, int x, int y){
 		this.buttonNumber = buttonNumber;
 	}
 	

@@ -1,6 +1,8 @@
 package com.example.walldefence;
 
 import java.util.ArrayList;
+
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.Log;
@@ -12,9 +14,8 @@ public class Enemy extends Actor {
 
 	private EnemyState enemyState;
 	private final String TAG = "Enemy";
-	public Enemy(Bitmap bitmap, int x, int y, float scaleWidth,
-			float scaleHeight, int fps) {
-		super(bitmap, x, y, scaleHeight, scaleWidth, fps, 1, 1);
+	public Enemy(Bitmap bitmap, int x, int y, int fps) {
+		super(bitmap, x, y, fps, 1, 1);
 		this.xSpeed = -6;
 		this.ySpeed = 0;
 		this.enemyState = EnemyState.moving;

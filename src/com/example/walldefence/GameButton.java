@@ -15,7 +15,7 @@ public class GameButton extends Button{
 	
 	public GameButton(Context myContext, int buttonNumber, int x, int y,
 			float scaleWidth, float scaleHeight) {
-		super(myContext, buttonNumber, x, y, scaleWidth, scaleHeight);
+		super(buttonNumber, x, y);
 		// TODO Auto-generated constructor stub
 		this.getBitmaps(this.buttonNumber, myContext, scaleWidth, scaleHeight);
 		this.width = main_button.getWidth();
@@ -98,21 +98,18 @@ public class GameButton extends Button{
 		return false;
 	}
 	
-	public ArrayList<Ally> createAlly(Context myContext, ArrayList<Ally> allies, int screenHeight, int screenWidth, 
-			float scaleHeight, float scaleWidth, boolean onTopOfWall){
+	public ArrayList<Ally> createAlly(Assets assets, ArrayList<Ally> allies, int screenHeight, int screenWidth, boolean onTopOfWall){
 		// Will have to turn into a switch statement later depending on buttonID
 				// GET SPRITESHEET FROM ANDREW AND WORK AROUND THAT
 				switch (this.buttonNumber) {
 				case 1:
-					allies.add(new AllySoldier(BitmapFactory.decodeResource(
-							myContext.getResources(), R.drawable.test_sprite), 10,
-							2 * screenHeight / 3, scaleWidth, scaleHeight, MainThread
+					allies.add(new AllySoldier(assets.getTestSprite(), 10,
+							2 * screenHeight / 3, MainThread
 									.getMaxFps(), onTopOfWall));
 					break;
 				case 2:
-					allies.add(new AllyArcher(BitmapFactory.decodeResource(
-							myContext.getResources(), R.drawable.test_archer_sprite), 10,
-							2 * screenHeight / 3, scaleWidth, scaleHeight, MainThread
+					allies.add(new AllyArcher(assets.getTestArcherSprite(), 10,
+							2 * screenHeight / 3, MainThread
 									.getMaxFps(), onTopOfWall));
 					break;
 				default:
