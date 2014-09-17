@@ -30,7 +30,7 @@ public abstract class Ally extends Actor {
 		this.srcRect = new Rect(0, 0, this.width, this.height); // Rect for selecting the frame
 	}
 
-	public void update(ArrayList<Enemy> enemies, Wall wall, long gameTime, ArrayList<Projectile> projectiles) {
+	public void update(ArrayList<Enemy> enemies, Wall wall, long gameTime, ArrayList<Projectile> projectiles, Assets assets) {
 		checkEnemyCollision(enemies); // check enemies first so if unit is done
 										// attacking they will next check if
 										// they are at wall
@@ -45,7 +45,7 @@ public abstract class Ally extends Actor {
 			currentFrame++;
 			if (currentFrame >= numberOfFramesWidth) {
 				if(allyState == AllyState.attackingEnemy){
-					attackEnemy(enemies, projectiles);
+					attackEnemy(enemies, projectiles, assets);
 				}
 				currentFrame = 0;
 			}
@@ -106,7 +106,7 @@ public abstract class Ally extends Actor {
 	}
 
 	// Made actor so usable by both classes. Check for errors but should be alright
-	public void attackEnemy(ArrayList<Enemy> enemies, ArrayList<Projectile> projectiles) {
+	public void attackEnemy(ArrayList<Enemy> enemies, ArrayList<Projectile> projectiles, Assets assets) {
 		//Log.d(TAG, "Attacking!");
 		boolean attacked = false;
 		int spot = 0;
@@ -121,11 +121,7 @@ public abstract class Ally extends Actor {
 					}
 				}
 				else{
-						Bitmap arrow_bitmap = BitmapFactory.decodeResource(
-								myContext.getResources(), R.drawable.test_arrow);
-						projectiles.add(new Projectile(Bitmap.createScaledBitmap(arrow_bitmap,
-								(int) (bitmap.getWidth() * scaleWidth),
-								(int) (bitmap.getHeight() * scaleHeight), true),
+						projectiles.add(new Projectile(assets.getTestArrow(),
 								this.x+this.width, this.y-3*(this.y)/4, 5, 0, damage));
 						setAllyMoving();	
 				}

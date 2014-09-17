@@ -1,7 +1,10 @@
 package com.example.walldefence;
 
+import java.util.ArrayList;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 
 public class Projectile {
 	protected Bitmap bitmap;
@@ -18,15 +21,25 @@ public class Projectile {
 		this.damage = damage;
 	}
 	
-	public void update(){
-		
+	public void update(ArrayList<Enemy> enemies, Wall wall){
+		x = x + xSpeed;
+		y = y + ySpeed;
+		checkCollision(enemies);
 	}
 	
 	public void drawBitmap(Canvas canvas){
 		canvas.drawBitmap(bitmap, x, y-height, null);
 	}
 	
-	public void checkCollision(){
-		
+	public void checkCollision(ArrayList<Enemy> enemies){
+		for(int spot = 0; spot < enemies.size(); spot++){
+		if (Rect.intersects(new Rect(x + xSpeed, y - height - ySpeed, x
+				+ width + xSpeed, y - ySpeed), enemies.get(spot).getBody())) {
+			//Log.d(TAG, "AHA");
+				if (enemies.get(spot).takeDamage(damage)) {
+					enemies.remove(spot);
+				}
+			}
+		}
 	}
 }

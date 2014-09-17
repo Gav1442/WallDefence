@@ -134,7 +134,10 @@ public class MainGamePanel extends SurfaceView implements
 				endWave();
 			} else {
 				for (int spot = 0; spot < allies.size(); spot++) {
-					allies.get(spot).update(enemies, wall, currentSystemTime, projectiles);
+					allies.get(spot).update(enemies, wall, currentSystemTime, projectiles, assets);
+				}
+				for (int spot = 0; spot < projectiles.size(); spot++) {
+					projectiles.get(spot).update(enemies, wall);
 				}
 				for (int spot = 0; spot < enemies.size(); spot++) {
 					enemies.get(spot).update(allies, wall);
@@ -160,6 +163,9 @@ public class MainGamePanel extends SurfaceView implements
 				wall.drawBitmap(canvas);
 				for (int spot = 0; spot < allies.size(); spot++) {
 					allies.get(spot).drawBitmap(canvas);
+				}
+				for (int spot = 0; spot < projectiles.size(); spot++) {
+					projectiles.get(spot).drawBitmap(canvas);
 				}
 				for (int spot = 0; spot < enemies.size(); spot++) {
 					enemies.get(spot).drawBitmap(canvas);
